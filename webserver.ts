@@ -3,8 +3,14 @@ import { Status, STATUS_TEXT } from "https://deno.land/std@0.128.0/http/http_sta
 
 const hostname = Deno.env.get("SERVER_ADDRESS") || "127.0.0.1";
 const port = Number(Deno.env.get("SERVER_PORT")) || 6781;
+const serverToken = Deno.env.get("SERVER_TOKEN") || Math.random();
 
 const reloadHandler = async (request: Request): Promise<Response> => {
+  const authToken = request.headers.get("x-authorization");
+  if (authToken !== serverToken) {
+    return new Response(STATUS_TEXT.get(Status.Forbidden), { status: Status.Forbidden });
+  }
+
   return new Response("Restarted", { status: Status.Accepted });
 };
 
